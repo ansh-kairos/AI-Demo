@@ -1,36 +1,34 @@
 # MailMind AI
 
-> AI-powered email assistant that reads your Gmail inbox, drafts smart replies, flags urgent emails, summarizes threads, and reminds you to follow up — all for free.
+> AI-powered email assistant that drafts smart replies, flags urgent emails, summarizes threads, and reminds you to follow up — all for free.
 
 ## Tech Stack
 
 - **Frontend:** Next.js 14 (App Router) + Tailwind CSS + shadcn/ui
-- **Auth:** NextAuth.js with Google OAuth
+- **Auth:** NextAuth.js with Email/Password credentials
 - **Database:** SQLite (dev) / PostgreSQL (prod) via Prisma ORM
 - **AI/LLM:** Groq API (primary) + NVIDIA NIM (fallback)
-- **Email:** Gmail API via `googleapis`
 - **State:** Zustand
 
 ## Features
 
 - **Smart Inbox** — AI-prioritized emails with urgency scores (🔴🟡🟢)
-- **AI Reply Drafts** — Generate context-aware replies with tone control
+- **AI Reply Drafts** — Generate context-aware replies with tone control (Professional/Friendly/Brief/Assertive)
 - **Thread Summaries** — TL;DR + key points + action items
 - **Follow-up Reminders** — Never forget to reply to important emails
-- **Privacy First** — Emails never stored, always fetched live from Gmail
+- **Simple Auth** — Email/password registration and login (no OAuth setup required)
 
 ## Prerequisites
 
 - Node.js 18+
-- A Google account (for Gmail)
-- Free accounts on: [Groq](https://console.groq.com), [NVIDIA NIM](https://build.nvidia.com)
+- (Optional) Free accounts on: [Groq](https://console.groq.com), [NVIDIA NIM](https://build.nvidia.com) for AI features
 
-## Local Development Setup
+## Quick Start
 
 ```bash
 # 1. Clone the repo
-git clone https://github.com/ansh-kairos/ai-demo.git
-cd ai-demo
+git clone https://github.com/ansh-kairos/AI-Demo.git
+cd AI-Demo
 
 # 2. Install dependencies
 npm install
@@ -38,7 +36,8 @@ npm install
 # 3. Copy environment file
 cp .env.example .env.local
 
-# 4. Fill in .env.local (see Environment Variables below)
+# 4. Generate a secret (paste into .env.local as NEXTAUTH_SECRET)
+openssl rand -base64 32
 
 # 5. Set up database
 DATABASE_URL=file:./dev.db npx prisma migrate dev --name init
@@ -47,24 +46,24 @@ DATABASE_URL=file:./dev.db npx prisma migrate dev --name init
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000)
+Open [http://localhost:3000](http://localhost:3000) → Click "Get Started Free" → Register → Dashboard loads with demo emails.
 
 ## Environment Variables
 
 Create `.env.local` with:
 
 ```env
-GOOGLE_CLIENT_ID=your_google_client_id
-GOOGLE_CLIENT_SECRET=your_google_client_secret
 NEXTAUTH_URL=http://localhost:3000
 NEXTAUTH_SECRET=<run: openssl rand -base64 32>
-GROQ_API_KEY=your_groq_api_key
-NVIDIA_NIM_API_KEY=your_nvidia_nim_api_key
 DATABASE_URL=file:./dev.db
 CRON_SECRET=any_random_string
+
+# Optional - for AI features:
+GROQ_API_KEY=your_groq_api_key
+NVIDIA_NIM_API_KEY=your_nvidia_nim_api_key
 ```
 
-## Getting API Keys
+## Getting AI API Keys (Optional)
 
 ### Groq API Key (Free)
 1. Visit [https://console.groq.com](https://console.groq.com)
@@ -76,58 +75,49 @@ CRON_SECRET=any_random_string
 2. Sign up → Profile → API Keys → Generate
 3. Save as `NVIDIA_NIM_API_KEY`
 
-### Google OAuth + Gmail API
-1. Go to [Google Cloud Console](https://console.cloud.google.com)
-2. Create project → Enable Gmail API
-3. APIs & Services → Credentials → Create OAuth 2.0 Client ID
-4. Application type: Web application
-5. Redirect URI: `http://localhost:3000/api/auth/callback/google`
-6. Copy Client ID and Client Secret
-
-**Required Gmail Scopes:**
-- `gmail.readonly`
-- `gmail.send`
-- `gmail.modify`
-
 ## Deployment
 
-### Option A: Vercel (Recommended)
+### Vercel (Recommended)
 
 1. Push to GitHub
 2. Import in [Vercel](https://vercel.com) → New Project
-3. Set all environment variables (use PostgreSQL for `DATABASE_URL` via [Neon.tech](https://neon.tech))
-4. Deploy — cron job for reminders is configured via `vercel.json`
+3. Set environment variables (use PostgreSQL via [Neon.tech](https://neon.tech) for `DATABASE_URL`)
+4. Deploy — cron job configured via `vercel.json`
 
-### Option B: Render
+### Render
 
 1. Push to GitHub
-2. Create new Web Service on [Render](https://render.com)
+2. Create Web Service on [Render](https://render.com)
 3. Build: `npm install && npx prisma generate && npx prisma migrate deploy && npm run build`
 4. Start: `npm start`
-5. Set environment variables, use Render PostgreSQL or Neon.tech
-
-## Using the App
-
-1. **Login:** Click "Sign in with Google" → Authorize Gmail access
-2. **View Inbox:** Emails load with AI urgency scores (🔴🟡🟢)
-3. **Draft a Reply:** Click email → "Draft Reply" → Select tone → Generate → Edit → Send/Copy
-4. **Summarize:** Open thread → "Summarize" → View TL;DR + key points
-5. **Set Reminder:** Open email → "Remind Me" → Choose time → Get notified via email
+5. Set environment variables
 
 ## Project Structure
 
 ```
 ├── app/                    # Next.js App Router pages & API routes
 │   ├── api/               # Backend API endpoints
+│   │   ├── auth/          # Auth (NextAuth + registration)
+│   │   ├── emails/        # Email list, thread, reply, summarize, prioritize
+│   │   ├── reminders/     # Create, list, cron
+│   │   └── user/          # Preferences
 │   ├── dashboard/         # Protected dashboard pages
-│   └── page.tsx           # Landing page
-├── components/            # React components
-├── lib/                   # Server utilities (auth, gmail, llm)
+│   ├── login/             # Login page
+│   └── register/          # Registration page
+├── components/            # React components (UI + app-specific)
+├── lib/                   # Server utilities (auth, gmail, llm, prisma)
 ├── prompts/               # LLM prompt templates
 ├── store/                 # Zustand state management
-├── prisma/                # Database schema & migrations
-└── public/                # Static assets
+└── prisma/                # Database schema & migrations
 ```
+
+## Using the App
+
+1. **Register:** Create account with email + password
+2. **Dashboard:** View inbox with AI urgency scores (🔴🟡🟢)
+3. **Draft Reply:** Click email → "Draft Reply" → Select tone → Generate
+4. **Summarize:** Open thread → "Summarize" → View TL;DR + key points
+5. **Reminders:** Open email → "Remind Me" → Choose time
 
 ## License
 

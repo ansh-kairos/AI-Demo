@@ -1,10 +1,9 @@
 "use client";
 
 import { useSession, signOut } from "next-auth/react";
-import { Brain, LogOut, Settings } from "lucide-react";
+import { Brain, LogOut, Settings, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import Image from "next/image";
 
 export default function Header() {
   const { data: session } = useSession();
@@ -26,15 +25,9 @@ export default function Header() {
                 </Button>
               </Link>
               <div className="flex items-center gap-2">
-                {session.user.image && (
-                  <Image
-                    src={session.user.image}
-                    alt={session.user.name || "User"}
-                    width={32}
-                    height={32}
-                    className="rounded-full"
-                  />
-                )}
+                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                  <User className="h-4 w-4 text-primary" />
+                </div>
                 <span className="text-sm text-muted-foreground hidden md:inline">
                   {session.user.email}
                 </span>

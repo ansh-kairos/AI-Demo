@@ -1,6 +1,6 @@
 "use client";
 
-import { signIn, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,7 @@ import {
   Shield,
   ArrowRight,
 } from "lucide-react";
+import Link from "next/link";
 
 export default function LandingPage() {
   const { data: session, status } = useSession();
@@ -56,16 +57,28 @@ export default function LandingPage() {
     {
       icon: Shield,
       title: "Privacy First",
-      description: "Emails never stored — always fetched live from Gmail",
+      description: "Emails never stored — always fetched live",
     },
   ];
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
       <header className="container mx-auto px-4 py-6">
-        <div className="flex items-center gap-2">
-          <Brain className="h-7 w-7 text-primary" />
-          <span className="font-bold text-xl">MailMind AI</span>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Brain className="h-7 w-7 text-primary" />
+            <span className="font-bold text-xl">MailMind AI</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Link href="/login">
+              <Button variant="ghost" size="sm">
+                Sign In
+              </Button>
+            </Link>
+            <Link href="/register">
+              <Button size="sm">Get Started</Button>
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -80,17 +93,21 @@ export default function LandingPage() {
             threads, and set follow-up reminders — all powered by free AI
             models.
           </p>
-          <Button
-            size="lg"
-            onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
-            className="gap-2 text-lg px-8 py-6"
-          >
-            <Mail className="h-5 w-5" />
-            Sign in with Google
-            <ArrowRight className="h-4 w-4" />
-          </Button>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Link href="/register">
+              <Button size="lg" className="gap-2 text-lg px-8 py-6">
+                Get Started Free
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
+            <Link href="/login">
+              <Button size="lg" variant="outline" className="gap-2 text-lg px-8 py-6">
+                Sign In
+              </Button>
+            </Link>
+          </div>
           <p className="text-xs text-muted-foreground mt-3">
-            Connects to Gmail via OAuth. Your emails are never stored.
+            No credit card required. Free forever.
           </p>
         </section>
 

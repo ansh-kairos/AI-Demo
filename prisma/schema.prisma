@@ -46,10 +46,9 @@ model User {
   id            String       @id @default(cuid())
   email         String       @unique
   name          String?
+  password      String?
   emailVerified DateTime?
   image         String?
-  accessToken   String?
-  refreshToken  String?
   accounts      Account[]
   sessions      Session[]
   reminders     Reminder[]
